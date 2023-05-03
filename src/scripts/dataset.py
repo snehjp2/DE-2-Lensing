@@ -8,7 +8,6 @@ import torchvision.transforms as T
 import matplotlib.pyplot as plt
 from torchvision import transforms
 
-
 class LensingDataset(Dataset):
     """Loading Galaxy10 DECals test dataset from .h5 file.
     Test dataset has original images roated at random angles.
@@ -30,7 +29,7 @@ class LensingDataset(Dataset):
         original_image = self.dataset['original_images'][idx]
         lensed_image = self.dataset['lensed_images'][idx]
         label = torch.tensor(self.dataset['labels'][idx],dtype=torch.long)
-        params = self.dataset['lens_params_list'][idx]
+        params = torch.tensor(self.dataset['lens_params_list'][idx], dtype=torch.float)
         
         if self.transform:
             original_image = self.transform(original_image)
@@ -48,5 +47,4 @@ if __name__ == '__main__':
     img, lensed_img, label, params = dataset[12342]
     print(img.shape)
     print(lensed_img.shape)
-    print(label)
     print(params)
