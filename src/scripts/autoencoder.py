@@ -5,10 +5,10 @@ from e2cnn import gspaces
 from e2cnn import nn as e2cnn_nn
 import torchvision
 
-encoder_fields = [96, 48, 24]   
+# encoder_fields = [96, 48, 24]   
 
 class Encoder(torch.nn.Module):
-    def __init__(self, N, encoder_fields, reflections=False):
+    def __init__(self, N, encoder_fields = [96, 48, 24], reflections = False):
         super(Encoder, self).__init__()
         
         self.N = N
@@ -142,7 +142,7 @@ class LinearDecoder(nn.Module):
         self.flatten = nn.Flatten()
         
 
-        self.fc = nn.Sequential(nn.Linear(self.flatten.shape(), 512),
+        self.fc = nn.Sequential(nn.Linear(32*32*64, 512),
                                 nn.ReLU(inplace=True),
                                 nn.Linear(512, 128),
                                 nn.ReLU(inplace=True),
@@ -163,7 +163,7 @@ class LinearDecoder(nn.Module):
 class Autoencoder(nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
-        self.encoder = Encoder(N=4, encoder_fields=encoder_fields, reflections=True)
+        self.encoder = Encoder(N=4, reflections=True)
         self.decoder1 = Decoder()
         self.decoder2 = LinearDecoder()
     
