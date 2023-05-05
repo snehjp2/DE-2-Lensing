@@ -68,25 +68,18 @@ class Encoder(torch.nn.Module):
         
     def forward(self, input: torch.Tensor):   
         x = e2cnn_nn.GeometricTensor(input, self.input_type)
-        print(f'encoder input: {x.tensor.shape}')
         x = self.block1(x)
-        print(f'encoder block1: {x.tensor.shape}')
         x = self.pool1(x)
-        print(f'encoder pool1: {x.tensor.shape}')
         x = self.block2(x)
-        print(f'encoder block2: {x.tensor.shape}')
         x = self.block3(x)
-        print(f'encoder block3: {x.tensor.shape}')
         x = self.pool2(x)
-        print(f'encoder pool3: {x.tensor.shape}')
         x = self.gpool(x)
-        print(f'decoder input: {x.tensor.shape}')
         x = x.tensor
         
         return x 
     
-
 class Decoder(nn.Module):
+    
     def __init__(self):
         super(Decoder, self).__init__()
 
@@ -128,50 +121,68 @@ class Decoder(nn.Module):
         
     def forward(self, x):
         x = self.conv_block1(x)
-        print(f'decoder block1: {x.shape}')
         x = self.conv_block2(x)
-        print(f'decoder block2: {x.shape}')
         x = self.conv_block3(x)
-        print(f'decoder block3: {x.shape}')
         x = self.conv_block4(x)
-        print(f'decoder block3: {x.shape}')
         return x
     
+class LinearDecoder(nn.Module):
+    def __init__(self):
+        super(LinearDecoder, self).__init__()
+        
+        self.conv_block1 = nn.Sequential(
+            nn.ConvTranspose2d(24, 64, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+        
+        self.flatten = nn.Flatten()
+        
+
+        self.fc = nn.Sequential(nn.Linear(self.flatten.shape(), 512),
+                                nn.ReLU(inplace=True),
+                                nn.Linear(512, 128),
+                                nn.ReLU(inplace=True),
+                                nn.Linear(128, 32),
+                                nn.ReLU(inplace=True),
+                                nn.Linear(32, 32),
+                                nn.ReLU(inplace=True),
+                                nn.Linear(32, 5))
+        
+    def forward(self, x):
+        x = self.conv_block1(x)
+        x = self.flatten(x)
+        x = self.fc(x)
+        return x
+                                
+        
     
 class Autoencoder(nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
-        self.encoder = Encoder(N=2, encoder_fields=encoder_fields, reflections=True)
-        self.decoder = Decoder()
+        self.encoder = Encoder(N=4, encoder_fields=encoder_fields, reflections=True)
+        self.decoder1 = Decoder()
+        self.decoder2 = LinearDecoder()
     
     def forward(self, x):
-        z = self.encoder(x)
-        out = self.decoder(z)
-        return out
+        x = self.encoder(x)
+        x1 = self.decoder1(x)
+        x2 = self.decoder2(x)
+        return x1, x2
     
-    
-def load_D4_encoder():
-    D4_encoder = Encoder(N=4, encoder_fields=encoder_fields, reflections=True)
-    return D4_encoder
-
-def load_decoder():
-    decoder = Decoder()
-    return decoder
     
 def load_autoencoder():
     autoencoder = Autoencoder()
     return autoencoder
-
-
-model_dict = {'D4_encoder': load_D4_encoder,
-              'decoder': load_decoder,
-              'autoencoder': load_autoencoder}
     
 if __name__ == '__main__':
-        
-    # encoder = Encoder(N=1, encoder_fields=encoder_fields, reflections=True)
+    
+    autoencoder = load_autoencoder()
+
     x = torch.rand(size=(1,3,256,256))
-    autoencoder = Autoencoder()
     y = autoencoder(x)
    
     print(f'Trainable parameters = {sum(p.numel() for p in autoencoder.parameters() if p.requires_grad)}')
