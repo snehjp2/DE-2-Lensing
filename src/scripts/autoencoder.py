@@ -141,7 +141,6 @@ class LinearDecoder(nn.Module):
         
         self.flatten = nn.Flatten()
         
-
         self.fc = nn.Sequential(nn.Linear(32*32*64, 512),
                                 nn.ReLU(inplace=True),
                                 nn.Linear(512, 128),
@@ -161,6 +160,7 @@ class LinearDecoder(nn.Module):
         
     
 class Autoencoder(nn.Module):
+    
     def __init__(self):
         super(Autoencoder, self).__init__()
         self.encoder = Encoder(N=4, reflections=True)
@@ -182,9 +182,10 @@ if __name__ == '__main__':
     
     autoencoder = load_autoencoder()
 
-    x = torch.rand(size=(1,3,256,256))
-    y = autoencoder(x)
-   
+    x = torch.rand(size=(1, 3, 256, 256))
+    img, vec = autoencoder(x)
+    print(img.shape)
+    print(vec.shape)
     print(f'Trainable parameters = {sum(p.numel() for p in autoencoder.parameters() if p.requires_grad)}')
     
         
