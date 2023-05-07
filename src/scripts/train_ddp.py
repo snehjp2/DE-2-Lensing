@@ -136,7 +136,7 @@ def main(config):
     best_val_loss = float('inf')
     best_val_epoch = 0
     final_train_loss = None
-    early_stopping_patience = config['parameters']['early_stopping_patience']
+    early_stopping_patience = config['parameters']['early_stopping']
     early_stopping_counter = 0
     
     for epoch in range(1, epochs=config['parameters']['epochs'] + 1):
