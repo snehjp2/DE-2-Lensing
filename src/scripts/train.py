@@ -28,11 +28,12 @@ def set_all_seeds(num):
 def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler = None, epochs=100, device='cuda', save_dir='checkpoints', early_stopping_patience=10, report_interval=5):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-
-    model.to(device)
     
     if device == 'cuda' and torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
+        model.to(device)
+        
+    else:
         model.to(device)
     
     print("Model Loaded to Device!")
