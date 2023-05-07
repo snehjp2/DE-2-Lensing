@@ -15,4 +15,4 @@ parameters :
   milestones : [ 25, 50, 75 ]
 
 
-save_dir : /Users/snehpandya/Projects/DE-2-Lensing/final_models/
+save_dir : /n/home04/spandya/DE-2-Lensing/final_models/

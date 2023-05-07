@@ -16,4 +16,4 @@ source /n/home04/spandya/miniconda3/bin/activate
 conda activate gdl
 
 python -c'import torch; print(torch.cuda.is_available())'
-python /n/home04/spandya/GCNNMorphology/src/scripts/train.py --config /n/home04/spandya/GCNNMorphology/src/config/d4resnet50.yaml
+python /n/home04/spandya/DE-2-Lensing/src/scripts/train.py --config /n/home04/spandya/DE-2-Lensing/src/config/autoencoder.yaml

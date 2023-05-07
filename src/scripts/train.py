@@ -144,14 +144,11 @@ def main(config):
     end = time.time()
     print(f"dataset loaded in {end - start:.3f} s")
     
-
-    # train_dataloader, val_dataloader = subsample(train_dataset, 0.2)
-    
     val_len = int(config['parameters']['val_size'] * len(train_dataset))
     train_len = len(train_dataset) - val_len
     train_dataset, val_dataset = torch.utils.data.random_split(train_dataset, [train_len, val_len])
-    train_dataloader = DataLoader(train_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, pin_memory=True)
-    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, pin_memory=True)
+    train_dataloader = DataLoader(train_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, pin_memory = (True if torch.cuda.is_available() else False))
+    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, pin_memory = (True if torch.cuda.is_available() else False))
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     save_dir = config['save_dir'] + config['model'] + '_' + timestr
