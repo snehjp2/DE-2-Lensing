@@ -36,6 +36,7 @@ def train(model, train_dataloader, optimizer, epoch, device='cuda'):
     model.train()
     for i, batch in tqdm(enumerate(train_dataloader, 0), unit="batch", total=len(train_dataloader)):
         original_image, lensed_image, label, params = batch
+        print('batch loaded')
         original_image, lensed_image, params = original_image.to(device), lensed_image.to(device), params.to(device)
         print('batch loaded to device')
         optimizer.zero_grad()
@@ -121,11 +122,13 @@ def main(config):
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
     train_dataloader = DataLoader(train_dataset, batch_size=config['parameters']['batch_size'], sampler = train_sampler,
                                   num_workers=int(os.environ["SLURM_CPUS_PER_TASK"]), pin_memory=True)                
-    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], 
+    val_dataloader = DataLoader(val_dataset, shuffle=True,
                                 num_workers=int(os.environ["SLURM_CPUS_PER_TASK"]), pin_memory=True)
     
     model = load_autoencoder().to(local_rank)
+    print("Model loaded!")
     ddp_model = DDP(model, device_ids=[local_rank])
+    print("DDP model loaded!")
     optimizer = optim.AdamW(ddp_model.parameters(), lr = config['parameters']['lr'], 
                             weight_decay = config['parameters']['weight_decay'])
 
