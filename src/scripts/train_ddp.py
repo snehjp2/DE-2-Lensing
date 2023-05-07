@@ -139,7 +139,7 @@ def main(config):
     early_stopping_patience = config['parameters']['early_stopping']
     early_stopping_counter = 0
     
-    for epoch in range(1, epochs=config['parameters']['epochs'] + 1):
+    for epoch in range(1, config['parameters']['epochs'] + 1):
         train_loss = train(model = ddp_model, device=local_rank, train_loader=train_dataloader, optimizer=optimizer, epoch=epoch)
         
         if epoch % config['parameters']['report_interval'] == 0:
