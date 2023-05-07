@@ -30,8 +30,8 @@ def train_model(model, train_dataloader, val_dataloader, optimizer, scheduler = 
         os.makedirs(save_dir)
     
     if device == 'cuda' and torch.cuda.device_count() > 1:
-        model = nn.DataParallel(model)
         model.to(device)
+        model = nn.DataParallel(model)
         
     else:
         model.to(device)
