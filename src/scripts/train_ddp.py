@@ -37,15 +37,21 @@ def train(model, train_dataloader, optimizer, epoch, device='cuda'):
     for i, batch in tqdm(enumerate(train_dataloader, 0), unit="batch", total=len(train_dataloader)):
         original_image, lensed_image, label, params = batch
         original_image, lensed_image, params = original_image.to(device), lensed_image.to(device), params.to(device)
+        print('batch loaded to device')
         optimizer.zero_grad()
         img_output, param_output = model(lensed_image)
+        print("model outputted")
         loss = nn.MSELoss()
         img_loss = loss(img_output, lensed_image)
         param_loss = loss(param_output, params)
         sum_loss = img_loss + param_loss
+        print("loss calculated")
         sum_loss.backward()
+        print("loss backpropagated")
         optimizer.step()
+        print("optimizer stepped")
         train_loss += sum_loss.item()
+        print("finished batch")
 
     train_loss /= len(train_dataloader)
     print(f"Epoch: {epoch + 1}, Train Loss: {train_loss:.4e}")
@@ -53,9 +59,9 @@ def train(model, train_dataloader, optimizer, epoch, device='cuda'):
 
 
 def validate(model, val_dataloader, device='cuda'):
+    print("Validating!")
     model.eval()
     val_loss = 0.0
-    val_losses = []
     with torch.no_grad():
         for batch in val_dataloader:
             original_image, lensed_image, label, params = batch
@@ -66,14 +72,12 @@ def validate(model, val_dataloader, device='cuda'):
             param_loss = loss(param_output, params)
             sum_loss = img_loss + param_loss
             val_loss += sum_loss.item()
-            val_losses.append(sum_loss.item())
 
     val_loss /= len(val_dataloader)
     return val_loss
 
 
 def setup(rank, world_size):
-    # initialize the process group
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
     
 def main(config):
@@ -137,10 +141,12 @@ def main(config):
     
     for epoch in range(1, config['parameters']['epochs'] + 1):
         train_loss = train(model = ddp_model, device=local_rank, train_dataloader=train_dataloader, optimizer=optimizer, epoch=epoch)
+        train_losses.append(train_loss)
         
         if epoch % config['parameters']['report_interval'] == 0:
             if rank == 0:
                 val_loss = validate(model=ddp_model, val_dataloader=val_dataloader, device=local_rank)
+                val_losses.append(val_loss)
 
                 if val_loss < best_val_loss:
                     best_val_loss = val_loss
