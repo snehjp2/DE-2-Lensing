@@ -148,8 +148,10 @@ def main(config):
     val_len = int(config['parameters']['val_size'] * len(train_dataset))
     train_len = len(train_dataset) - val_len
     train_dataset, val_dataset = torch.utils.data.random_split(train_dataset, [train_len, val_len])
-    train_dataloader = DataLoader(train_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, pin_memory = (True if torch.cuda.is_available() else False))
-    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, pin_memory = (True if torch.cuda.is_available() else False))
+    train_dataloader = DataLoader(train_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, 
+                                  pin_memory = (True if torch.cuda.is_available() else False), num_workers=4)
+    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, 
+                                pin_memory = (True if torch.cuda.is_available() else False), num_workers=4)
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     save_dir = config['save_dir'] + config['model'] + '_' + timestr
