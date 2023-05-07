@@ -75,7 +75,6 @@ class Encoder(torch.nn.Module):
         x = self.pool2(x)
         x = self.gpool(x)
         x = x.tensor
-        print(x.shape)
         
         return x 
     
