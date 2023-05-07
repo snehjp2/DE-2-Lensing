@@ -120,8 +120,8 @@ def main(config):
     
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas=world_size, rank=rank)
     train_dataloader = DataLoader(train_dataset, batch_size=config['parameters']['batch_size'], sampler = train_sampler,
-                                  shuffle=True, num_workers=int(os.environ["SLURM_CPUS_PER_TASK"]), pin_memory=True)                
-    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], shuffle=True, 
+                                  num_workers=int(os.environ["SLURM_CPUS_PER_TASK"]), pin_memory=True)                
+    val_dataloader = DataLoader(val_dataset, batch_size=config['parameters']['batch_size'], 
                                 num_workers=int(os.environ["SLURM_CPUS_PER_TASK"]), pin_memory=True)
     
     model = load_autoencoder().to(local_rank)
