@@ -28,11 +28,8 @@ def set_all_seeds(num):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-def train(model, train_dataloader, optimizer, epoch, device='cuda', save_dir='checkpoints'):
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+def train(model, train_dataloader, optimizer, epoch, device='cuda'):
 
-    train_losses, steps = [], [], []
     print("Training Started!")
 
     train_loss = 0.0
@@ -49,7 +46,6 @@ def train(model, train_dataloader, optimizer, epoch, device='cuda', save_dir='ch
         sum_loss.backward()
         optimizer.step()
         train_loss += sum_loss.item()
-        train_losses.append(sum_loss.item())
 
     train_loss /= len(train_dataloader)
     print(f"Epoch: {epoch + 1}, Train Loss: {train_loss:.4e}")
