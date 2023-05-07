@@ -1,0 +1,18 @@
+model : autoencoder
+dataset : /Users/snehpandya/Projects/DE-2-Lensing/data/lensing_dataset_SIS.h5
+
+parameters :
+  lr : 1.0e-2
+  weight_decay : 1.0e-4
+  momentum : 0.9
+  val_size : 0.2
+  batch_size : 128
+  epochs : 100
+  early_stopping : 15
+  report_interval : 5
+  lr_decay : 0.1
+  step_size : 50
+  milestones : [ 25, 50, 75 ]
+
+
+save_dir : /Users/snehpandya/Projects/DE-2-Lensing/final_models/
