@@ -8,7 +8,7 @@ import torchvision
 # encoder_fields = [96, 48, 24]   
 
 class Encoder(torch.nn.Module):
-    def __init__(self, N, encoder_fields = [96, 48, 24], reflections = False):
+    def __init__(self, N, encoder_fields = [48, 24, 16], reflections = False):
         super(Encoder, self).__init__()
         
         self.N = N
@@ -75,6 +75,7 @@ class Encoder(torch.nn.Module):
         x = self.pool2(x)
         x = self.gpool(x)
         x = x.tensor
+        print(x.shape)
         
         return x 
     
@@ -84,7 +85,7 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
 
         self.conv_block1 = nn.Sequential(
-            nn.ConvTranspose2d(24, 64, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.ConvTranspose2d(16, 64, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, kernel_size=3, padding=1),
@@ -131,7 +132,7 @@ class LinearDecoder(nn.Module):
         super(LinearDecoder, self).__init__()
         
         self.conv_block1 = nn.Sequential(
-            nn.ConvTranspose2d(24, 64, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.ConvTranspose2d(16, 64, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, kernel_size=3, padding=1),
