@@ -96,6 +96,9 @@ def main(config):
     timestr = time.strftime("%Y%m%d-%H%M%S")
     save_dir = config['save_dir'] + 'autoencoder_' + timestr
     
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    
     print("Loading train dataset!")
     start = time.time()
     train_dataset = LensingDataset(config['dataset'], transform)
