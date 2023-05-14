@@ -18,13 +18,13 @@ class EquivariantEncoder(torch.nn.Module):
         self.encoder_fields = encoder_fields
 
         if (reflections == True) and (self.N == 1):
-            self.r2_act = gspaces.Flip2dOnR2()
+            self.r2_act = gspaces.flip2dOnR2()
 
         elif reflections == True:
-            self.r2_act = gspaces.FlipRot2dOnR2(N=self.N)
+            self.r2_act = gspaces.flipRot2dOnR2(N=self.N)
 
         else:
-            self.r2_act = gspaces.Rot2dOnR2(N=self.N)
+            self.r2_act = gspaces.rot2dOnR2(N=self.N)
 
         in_type = escnn_nn.FieldType(
             self.r2_act, 3*[self.r2_act.trivial_repr])  # 3 channels
