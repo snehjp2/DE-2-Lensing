@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-from e2cnn import gspaces
-from e2cnn import nn as e2cnn_nn
+from escnn import gspaces
+from escnn import nn as escnn_nn
 import torchvision
 import lightning.pytorch as pl
 import argparse
@@ -26,59 +26,59 @@ class EquivariantEncoder(torch.nn.Module):
         else:
             self.r2_act = gspaces.Rot2dOnR2(N=self.N)
 
-        in_type = e2cnn_nn.FieldType(
+        in_type = escnn_nn.FieldType(
             self.r2_act, 3*[self.r2_act.trivial_repr])  # 3 channels
 
         self.input_type = in_type
 
-        out_type = e2cnn_nn.FieldType(
+        out_type = escnn_nn.FieldType(
             self.r2_act, self.encoder_fields[0]*[self.r2_act.regular_repr])
 
-        self.block1 = e2cnn_nn.SequentialModule(
-            e2cnn_nn.MaskModule(in_type, 256, margin=1),
-            e2cnn_nn.R2Conv(in_type, out_type, kernel_size=5,
+        self.block1 = escnn_nn.SequentialModule(
+            escnn_nn.MaskModule(in_type, 256, margin=1),
+            escnn_nn.R2Conv(in_type, out_type, kernel_size=5,
                             padding=2, bias=False, stride=1),
-            e2cnn_nn.InnerBatchNorm(out_type),
-            e2cnn_nn.ReLU(out_type, inplace=True)
+            escnn_nn.InnerBatchNorm(out_type),
+            escnn_nn.ReLU(out_type, inplace=True)
         )
 
-        self.pool1 = e2cnn_nn.SequentialModule(
-            e2cnn_nn.PointwiseAvgPoolAntialiased(
+        self.pool1 = escnn_nn.SequentialModule(
+            escnn_nn.PointwiseAvgPoolAntialiased(
                 out_type, sigma=0.66, stride=2)
         )
 
         in_type = self.block1.out_type
 
-        out_type = e2cnn_nn.FieldType(
+        out_type = escnn_nn.FieldType(
             self.r2_act, self.encoder_fields[1]*[self.r2_act.regular_repr])
 
-        self.block2 = e2cnn_nn.SequentialModule(
-            e2cnn_nn.R2Conv(in_type, out_type, kernel_size=5,
+        self.block2 = escnn_nn.SequentialModule(
+            escnn_nn.R2Conv(in_type, out_type, kernel_size=5,
                             padding=2, bias=False, stride=2),
-            e2cnn_nn.InnerBatchNorm(out_type),
-            e2cnn_nn.ReLU(out_type, inplace=True)
+            escnn_nn.InnerBatchNorm(out_type),
+            escnn_nn.ReLU(out_type, inplace=True)
         )
 
         in_type = self.block2.out_type
-        out_type = e2cnn_nn.FieldType(
+        out_type = escnn_nn.FieldType(
             self.r2_act, self.encoder_fields[2]*[self.r2_act.regular_repr])
 
-        self.block3 = e2cnn_nn.SequentialModule(
-            e2cnn_nn.R2Conv(in_type, out_type, kernel_size=5,
+        self.block3 = escnn_nn.SequentialModule(
+            escnn_nn.R2Conv(in_type, out_type, kernel_size=5,
                             padding=2, bias=False, stride=2),
-            e2cnn_nn.InnerBatchNorm(out_type),
-            e2cnn_nn.ReLU(out_type, inplace=True)
+            escnn_nn.InnerBatchNorm(out_type),
+            escnn_nn.ReLU(out_type, inplace=True)
         )
 
-        self.pool2 = e2cnn_nn.SequentialModule(
-            e2cnn_nn.PointwiseAvgPoolAntialiased(
+        self.pool2 = escnn_nn.SequentialModule(
+            escnn_nn.PointwiseAvgPoolAntialiased(
                 out_type, sigma=0.66, stride=2)
         )
 
-        self.gpool = e2cnn_nn.GroupPooling(out_type)
+        self.gpool = escnn_nn.GroupPooling(out_type)
 
     def forward(self, input: torch.Tensor):
-        x = e2cnn_nn.GeometricTensor(input, self.input_type)
+        x = escnn_nn.GeometricTensor(input, self.input_type)
         x = self.block1(x)
         x = self.pool1(x)
         x = self.block2(x)
