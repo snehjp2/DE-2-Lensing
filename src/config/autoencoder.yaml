@@ -1,12 +1,12 @@
 model : autoencoder
-dataset : /scratch/pandya.sne/E2_Lensing/lensing_dataset_SIS.h5
+dataset : /n/holystore01/LABS/iaifi_lab/Users/spandya/data/lensing_dataset_SIE.h5
 
 parameters :
   lr : 1.0e-2
   weight_decay : 1.0e-4
   momentum : 0.9
   val_size : 0.2
-  batch_size : 128
+  batch_size : 64
   epochs : 100
   early_stopping : 15
   report_interval : 5
@@ -15,4 +15,4 @@ parameters :
   milestones : [ 25, 50, 75 ]
 
 
-save_dir : /scratch/patel.purvi/DE-2-Lensing/logs
+save_dir : /n/holystore01/LABS/iaifi_lab/Users/spandya/data/lensing_checkpoints

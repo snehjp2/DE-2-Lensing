@@ -17,7 +17,9 @@ from lightning.pytorch.loggers import WandbLogger
 from lightning.pytorch.trainer import Trainer
 from lightning.pytorch import seed_everything
 
-
+NUM_WORKERS = int(os.environ["SLURM_CPUS_PER_TASK"])
+NUM_NODES = int(os.environ["SLURM_NNODES"])
+ALLOCATED_GPUS_PER_NODE = int(os.environ["SLURM_GPUS_ON_NODE"])
 
 def main(config):
     
@@ -73,14 +75,16 @@ def main(config):
 
     lr_monitor = LearningRateMonitor(logging_interval='step')
 
-    trainer = Trainer(accelerator='auto',max_epochs=config['parameters']['epochs'],callbacks=[checkpoint_callback, early_stop_callback, lr_monitor], logger=wand_logger, deterministic='warn')
+    trainer = Trainer(devices=2,
+    		num_nodes=2,
+		strategy='ddp',
+		accelerator='auto',
+		max_epochs=config['parameters']['epochs'],
+		callbacks=[checkpoint_callback, early_stop_callback, lr_monitor], 
+		logger=wand_logger, 
+		deterministic='warn')
 
     trainer.fit(model, train_dataloader, val_dataloader)
-
-    
-
-
-
 
 
 if __name__ == '__main__':
